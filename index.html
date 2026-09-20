@@ -1,17 +1,17 @@
 <style>
   .page3d { padding: 4px 0 8px; }
   .title-block { margin-bottom: 2.5rem; text-align: center; }
-  .title-main { font-size: 20px; font-weight: 500; color: var(--text-primary); margin: 0 0 6px; }
-  .title-sub { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+  .title-main { font-size: 20px; font-weight: 500; color: #1a1a1a; margin: 0 0 6px; }
+  .title-sub { font-size: 13px; color: #666666; margin: 0; line-height: 1.6; }
   .scene3d { perspective: 1600px; width: 100%; height: 560px; position: relative; touch-action: none; user-select: none; }
   .world { position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform-style: preserve-3d; transform: rotateX(-18deg) rotateY(28deg); cursor: grab; }
   .world.dragging { cursor: grabbing; }
   .axis-line { position: absolute; transform-origin: 0 0; background: #8a8a86; }
-  .axis-label { position: absolute; font-size: 13px; font-weight: 500; white-space: nowrap; color: var(--text-secondary); transform-style: preserve-3d; }
+  .axis-label { position: absolute; font-size: 13px; font-weight: 500; white-space: nowrap; color: #666666; transform-style: preserve-3d; }
   .node3d { position: absolute; width: 50px; height: 50px; border-radius: 50%; margin: -25px 0 0 -25px; display: flex; align-items: center; justify-content: center; cursor: pointer; transform-style: preserve-3d; box-shadow: 0 0 0 1.5px rgba(0,0,0,0.15); }
-  .node3d span { font-size: 12px; font-weight: 500; color: #fff; backface-visibility: hidden; }
+  .node3d span { font-size: 12px; font-weight: 500; color: #ffffff; backface-visibility: hidden; }
   .node3d:hover { filter: brightness(1.1); }
-  .ctrl-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; font-size: 13px; color: var(--text-secondary); }
+  .ctrl-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; font-size: 13px; color: #666666; }
 </style>
 
 <h2 class="sr-only"></h2>
@@ -37,7 +37,6 @@
   </div>
 
   <div class="ctrl-row">
-    <i class="ti ti-arrows-move" style="font-size:16px" aria-hidden="true"></i>
     <span></span>
   </div>
 </div>
@@ -45,18 +44,18 @@
 <script>
 (function() {
   var types = [
-    { cn: '暖春', en: 'Warm Spring', x: 70, y: 35, z: 55, color: '#E2733A' },
-    { cn: '暖秋', en: 'Warm Autumn', x: 65, y: -35, z: -10, color: '#9C4A24' },
-    { cn: '冷夏', en: 'Cool Summer', x: -60, y: 25, z: -10, color: '#2A7FA3' },
+    { cn: '暖春', en: 'Warm Spring', x: 70, y: 20, z: 55, color: '#E2733A' },
+    { cn: '暖秋', en: 'Warm Autumn', x: 65, y: -35, z: 10, color: '#9C4A24' },
+    { cn: '冷夏', en: 'Cool Summer', x: -60, y: 15, z: -10, color: '#2A7FA3' },
     { cn: '冷冬', en: 'Cool Winter', x: -70, y: -20, z: 55, color: '#122E6B' },
     { cn: '淺春', en: 'Light Spring', x: 40, y: 70, z: 35, color: '#D9BE3A' },
     { cn: '淺夏', en: 'Light Summer', x: -35, y: 70, z: -15, color: '#A9C6E8' },
-    { cn: '深秋', en: 'Dark Autumn', x: 30, y: -70, z: 10, color: '#4A2E1E' },
+    { cn: '深秋', en: 'Dark Autumn', x: 30, y: -70, z: 15, color: '#4A2E1E' },
     { cn: '深冬', en: 'Dark Winter', x: -25, y: -75, z: 45, color: '#0A0A0A' },
     { cn: '亮春', en: 'Bright Spring', x: 35, y: 5, z: 78, color: '#FF6A00' },
     { cn: '淨冬', en: 'Bright Winter', x: -35, y: 0, z: 80, color: '#1247A8' },
-    { cn: '柔秋', en: 'Soft Autumn', x: 30, y: 5, z: -55, color: '#C9A876' },
-    { cn: '柔夏', en: 'Soft Summer', x: -30, y: 5, z: -60, color: '#8898A6' }
+    { cn: '柔秋', en: 'Soft Autumn', x: 30, y: -25, z: -55, color: '#C9A876' },
+    { cn: '柔夏', en: 'Soft Summer', x: -30, y: -20, z: -60, color: '#8898A6' }
   ];
 
   var SCALE = 2.7;
@@ -81,7 +80,7 @@
   place(document.getElementById('labelZpos'), 0, 0, 108);
   place(document.getElementById('labelZneg'), 0, 0, -112);
 
-types.forEach(function(t) {
+  types.forEach(function(t) {
     var node = document.createElement('div');
     node.className = 'node3d';
     node.style.background = t.color;
@@ -94,7 +93,7 @@ types.forEach(function(t) {
     });
     world.appendChild(node);
   });
-  
+
   var rotX = -18, rotY = 28;
   var dragging = false, lastX = 0, lastY = 0;
   var scene = document.getElementById('scene');
