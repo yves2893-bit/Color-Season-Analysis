@@ -81,6 +81,19 @@
   place(document.getElementById('labelZpos'), 0, 0, 108);
   place(document.getElementById('labelZneg'), 0, 0, -112);
 
+types.forEach(function(t) {
+    var node = document.createElement('div');
+    node.className = 'node3d';
+    node.style.background = t.color;
+    node.innerHTML = '<span>' + t.cn + '</span>';
+    node.title = t.cn + ' ' + t.en;
+    place(node, t.x, t.y, t.z);
+    node.addEventListener('click', function(e) {
+      e.stopPropagation();
+      sendPrompt(t.cn + ' ' + t.en + ' 在三維色彩空間中的位置說明其冷暖、明暗、彩度數值，請詳細解釋');
+    });
+    world.appendChild(node);
+  });
   
   var rotX = -18, rotY = 28;
   var dragging = false, lastX = 0, lastY = 0;
