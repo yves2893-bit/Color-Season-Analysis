@@ -1,0 +1,119 @@
+<style>
+  .page3d { padding: 4px 0 8px; }
+  .title-block { margin-bottom: 2.5rem; text-align: center; }
+  .title-main { font-size: 20px; font-weight: 500; color: var(--text-primary); margin: 0 0 6px; }
+  .title-sub { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+  .scene3d { perspective: 1600px; width: 100%; height: 560px; position: relative; touch-action: none; user-select: none; }
+  .world { position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform-style: preserve-3d; transform: rotateX(-18deg) rotateY(28deg); cursor: grab; }
+  .world.dragging { cursor: grabbing; }
+  .axis-line { position: absolute; transform-origin: 0 0; background: #8a8a86; }
+  .axis-label { position: absolute; font-size: 13px; font-weight: 500; white-space: nowrap; color: var(--text-secondary); transform-style: preserve-3d; }
+  .node3d { position: absolute; width: 50px; height: 50px; border-radius: 50%; margin: -25px 0 0 -25px; display: flex; align-items: center; justify-content: center; cursor: pointer; transform-style: preserve-3d; box-shadow: 0 0 0 1.5px rgba(0,0,0,0.15); }
+  .node3d span { font-size: 12px; font-weight: 500; color: #fff; backface-visibility: hidden; }
+  .node3d:hover { filter: brightness(1.1); }
+  .ctrl-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; font-size: 13px; color: var(--text-secondary); }
+</style>
+
+<h2 class="sr-only"></h2>
+
+<div class="page3d">
+  <div class="title-block">
+    <p class="title-main">四季12型色彩三維座標圖</p>
+    <p class="title-sub">X軸為冷暖、Y軸為明暗、Z軸為彩度，拖曳旋轉觀察12型的立體分布位置</p>
+  </div>
+
+  <div class="scene3d" id="scene">
+    <div class="world" id="world">
+      <div class="axis-line" id="axisX"></div>
+      <div class="axis-line" id="axisY"></div>
+      <div class="axis-line" id="axisZ"></div>
+      <div class="axis-label" id="labelXpos">暖 →</div>
+      <div class="axis-label" id="labelXneg">← 冷</div>
+      <div class="axis-label" id="labelYpos">淺 ↑</div>
+      <div class="axis-label" id="labelYneg">↓ 深</div>
+      <div class="axis-label" id="labelZpos">高彩度 ↗</div>
+      <div class="axis-label" id="labelZneg">↙ 低彩度</div>
+    </div>
+  </div>
+
+  <div class="ctrl-row">
+    <i class="ti ti-arrows-move" style="font-size:16px" aria-hidden="true"></i>
+    <span></span>
+  </div>
+</div>
+
+<script>
+(function() {
+  var types = [
+    { cn: '暖春', en: 'Warm Spring', x: 70, y: 35, z: 55, color: '#E2733A' },
+    { cn: '暖秋', en: 'Warm Autumn', x: 65, y: -35, z: -10, color: '#9C4A24' },
+    { cn: '冷夏', en: 'Cool Summer', x: -60, y: 25, z: -10, color: '#2A7FA3' },
+    { cn: '冷冬', en: 'Cool Winter', x: -70, y: -20, z: 55, color: '#122E6B' },
+    { cn: '淺春', en: 'Light Spring', x: 40, y: 70, z: 35, color: '#D9BE3A' },
+    { cn: '淺夏', en: 'Light Summer', x: -35, y: 70, z: -15, color: '#A9C6E8' },
+    { cn: '深秋', en: 'Dark Autumn', x: 30, y: -70, z: 10, color: '#4A2E1E' },
+    { cn: '深冬', en: 'Dark Winter', x: -25, y: -75, z: 45, color: '#0A0A0A' },
+    { cn: '亮春', en: 'Bright Spring', x: 35, y: 5, z: 78, color: '#FF6A00' },
+    { cn: '淨冬', en: 'Bright Winter', x: -35, y: 0, z: 80, color: '#1247A8' },
+    { cn: '柔秋', en: 'Soft Autumn', x: 30, y: 5, z: -55, color: '#C9A876' },
+    { cn: '柔夏', en: 'Soft Summer', x: -30, y: 5, z: -60, color: '#8898A6' }
+  ];
+
+  var SCALE = 2.7;
+  var world = document.getElementById('world');
+
+  function place(el, x, y, z) {
+    el.style.transform = 'translate3d(' + (x*SCALE) + 'px,' + (-y*SCALE) + 'px,' + (z*SCALE) + 'px)';
+  }
+
+  var AXLEN = 100 * SCALE;
+  var ax = document.getElementById('axisX'); ax.style.width = (AXLEN*2)+'px'; ax.style.height='1.5px';
+  ax.style.transform = 'translate3d(-'+AXLEN+'px,0,0)';
+  var ay = document.getElementById('axisY'); ay.style.width = '1.5px'; ay.style.height=(AXLEN*2)+'px';
+  ay.style.transform = 'translate3d(0,-'+AXLEN+'px,0)';
+  var az = document.getElementById('axisZ'); az.style.width='1.5px'; az.style.height=(AXLEN*2)+'px';
+  az.style.transform = 'translate3d(0,0,-'+AXLEN+'px) rotateX(90deg)';
+
+  place(document.getElementById('labelXpos'), 108, 0, 0);
+  place(document.getElementById('labelXneg'), -112, 0, 0);
+  place(document.getElementById('labelYpos'), 0, 108, 0);
+  place(document.getElementById('labelYneg'), 0, -112, 0);
+  place(document.getElementById('labelZpos'), 0, 0, 108);
+  place(document.getElementById('labelZneg'), 0, 0, -112);
+
+  
+  var rotX = -18, rotY = 28;
+  var dragging = false, lastX = 0, lastY = 0;
+  var scene = document.getElementById('scene');
+
+  function applyRot() {
+    world.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg)';
+  }
+
+  function start(x, y) { dragging = true; lastX = x; lastY = y; world.classList.add('dragging'); }
+  function move(x, y) {
+    if (!dragging) return;
+    var dx = x - lastX, dy = y - lastY;
+    rotY += dx * 0.4;
+    rotX -= dy * 0.4;
+    rotX = Math.max(-85, Math.min(85, rotX));
+    lastX = x; lastY = y;
+    applyRot();
+  }
+  function end() { dragging = false; world.classList.remove('dragging'); }
+
+  scene.addEventListener('mousedown', function(e) { start(e.clientX, e.clientY); });
+  window.addEventListener('mousemove', function(e) { move(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', end);
+
+  scene.addEventListener('touchstart', function(e) {
+    var t = e.touches[0]; start(t.clientX, t.clientY);
+  }, { passive: true });
+  scene.addEventListener('touchmove', function(e) {
+    var t = e.touches[0]; move(t.clientX, t.clientY);
+  }, { passive: true });
+  scene.addEventListener('touchend', end);
+
+  applyRot();
+})();
+</script>
